@@ -1,2 +1,2 @@
-# poc_ms_email
+# Email microservice
 Proof of concept - Microservices using Kafka - Email
