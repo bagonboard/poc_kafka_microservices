@@ -9,6 +9,10 @@ Proof of concept, node.js microservices using kafka topics and [reactive program
   * Invoice generation service.
   * Push notifications service.
 
+## Distributed tracing
+
+![APM](doc/APM.png)
+
 ## Kafka Containers
 
  * [Kafka](https://kafka.apache.org/)
