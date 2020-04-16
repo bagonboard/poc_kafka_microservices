@@ -1,0 +1,68 @@
+version: '3.6'
+services:
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.6.1
+    restart: always
+    environment:
+    - bootstrap.memory_lock=true
+    - cluster.name=bob-cluster
+    - cluster.routing.allocation.disk.threshold_enabled=false
+    - discovery.type=single-node
+    - ES_JAVA_OPTS=-XX:UseAVX=2 -Xms1g -Xmx1g
+    ulimits:
+      memlock:
+        hard: -1
+        soft: -1
+    volumes:
+    - ${VOLUMES_BASE_PATH}elasticsearch:/usr/share/elasticsearch/data
+    expose:
+    - "9200"
+    ports:
+    - 127.0.0.1:9200:9200
+    networks:
+    - elastic
+    healthcheck:
+      interval: 20s
+      retries: 10
+      test: curl -s http://localhost:9200/_cluster/health | grep -vq '"status":"red"'    
+
+  kibana: 
+    image: docker.elastic.co/kibana/kibana:7.6.1
+    restart: always
+    depends_on:
+      - elasticsearch
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+    expose:
+    - "5601"
+    ports:
+    - 127.0.0.1:5601:5601
+    networks:
+    - elastic
+    healthcheck:
+      interval: 10s
+      retries: 20
+      test: curl --write-out 'HTTP %{http_code}' --fail --silent --output /dev/null http://localhost:5601/api/status    
+
+  apm-server:
+    image: docker.elastic.co/apm/apm-server:7.6.1
+    restart: always
+    depends_on:
+      - elasticsearch
+      - kibana
+    cap_add: ["CHOWN", "DAC_OVERRIDE", "SETGID", "SETUID"]
+    cap_drop: ["ALL"]
+    ports:
+    - 127.0.0.1:8200:8200
+    networks:
+    - elastic
+    healthcheck:
+      interval: 10s
+      retries: 12
+      test: curl --write-out 'HTTP %{http_code}' --fail --silent --output /dev/null http://localhost:8200/      
+
+networks:
+ elastic:
+   driver: bridge 

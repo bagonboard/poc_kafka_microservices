@@ -1,0 +1,155 @@
+{
+  "emails": [
+    {
+      "delay": 40,
+      "name": "send-email-confirmation",
+      "topics": [
+        {
+          "topic": "user-creation",
+          "partition": 0
+        },
+        {
+          "topic": "user-creation",
+          "partition": 1
+        }
+      ],
+      "spans": [
+        {
+          "duration": 35,
+          "name": "sendgrid.send",
+          "type": "email",
+          "action": "send",
+          "subtype": "sendgrid",
+          "spans": [
+            {
+              "duration": 5,
+              "name": "emails.log.findOneAndUpdate",
+              "action": "update",
+              "type": "db",
+              "subtype": "mongodb"
+            }
+          ]
+        }
+      ]      
+    },
+    {
+      "delay": 40,
+      "name": "send-email-invoice",
+      "topics": [
+        {
+          "topic": "invoice-creation",
+          "partition": 0
+        },
+        {
+          "topic": "invoice-creation",
+          "partition": 1
+        }
+      ],
+      "spans": [
+        {
+          "duration": 35,
+          "name": "sendgrid.send",
+          "type": "email",
+          "action": "send",
+          "subtype": "sendgrid",
+          "spans": [
+            {
+              "duration": 5,
+              "name": "emails.log.findOneAndUpdate",
+              "action": "update",
+              "type": "db",
+              "subtype": "mongodb"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "push-notifications": [
+    {
+      "delay": 50,
+      "name": "send-push",
+      "topics": [
+        {
+          "topic": "user-creation",
+          "partition": 0
+        },
+        {
+          "topic": "user-creation",
+          "partition": 1
+        }
+      ],
+      "spans": [
+        {
+          "duration": 45,
+          "name": "firebase.messaging.send",
+          "type": "notifications",
+          "action": "send",
+          "subtype": "firebase",
+          "spans": [
+            {
+              "duration": 5,
+              "name": "notifications.log.findOneAndUpdate",
+              "action": "update",
+              "type": "db",
+              "subtype": "mongodb"
+            }
+          ]
+        }
+      ]      
+    }
+  ],
+  "invoices": [
+    {
+      "delay": 150,
+      "name": "generate-invoice",
+      "targetTopic": "invoice-creation",
+      "topics": [
+        {
+          "topic": "user-creation",
+          "partition": 0
+        },
+        {
+          "topic": "user-creation",
+          "partition": 1
+        }
+      ],
+      "spans": [
+        {
+          "duration": 5,
+          "name": "bob.customer.find",
+          "type": "db",
+          "action": "query",
+          "subtype": "mongodb",
+          "spans": [
+            {
+              "duration": 50,
+              "name": "pdf.create",
+              "type": "file",
+              "action": "create",
+              "subtype": "pdf",
+              "spans": [
+                {
+                  "duration": 90,
+                  "name": "amazon.s3.upload",
+                  "action": "upload",
+                  "type": "amazon",
+                  "subtype": "s3",
+                  "spans": [
+                    {
+                      "duration": 5,
+                      "name": "bob.customer.update",
+                      "action": "update",
+                      "type": "db",
+                      "subtype": "mongodb"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
