@@ -25,7 +25,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
-      - KAFKA_ADVERTISED_HOST_NAME=localhost
+      - KAFKA_ADVERTISED_HOST_NAME=${HOST_IP}
       - JMX_PORT=9093
       - KAFKA_ADVERTISED_PORT=9092
       - KAFKA_DELETE_TOPIC_ENABLE=true
